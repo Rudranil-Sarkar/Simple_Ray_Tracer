@@ -66,17 +66,24 @@ class Sphere : public hitable{
 
 class HitObjectList : public hitable {
     private:
-        std::vector<Sphere> hit_list;
+        std::vector<hitable*> hit_list;
     public:
         template<class ...Args>
         HitObjectList(Args... args) : hit_list { std::forward<Args>(args)... } {}
+
+        HitObjectList(const HitObjectList& other) { hit_list = other.hit_list; }
+
+        HitObjectList() {}
+
+        void addObject(hitable* h) { hit_list.push_back(h); }
+
         bool hit_test(const Ray& r, double tmin, double tmax, hit_record& rec) override
         {
             bool hitAnyThing = false;
             double closest = tmax;
-            for(Sphere& s: hit_list)
+            for(hitable* s: hit_list)
             {
-                bool has_hit = s.hit_test(r, tmin, closest, rec);
+                bool has_hit = s -> hit_test(r, tmin, closest, rec);
                 if(has_hit) closest = rec.t;
                 hitAnyThing |= has_hit;
             }
