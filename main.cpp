@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "hitObjects.h"
 
+/*Determine the color of the pixel by scattered ray*/
 vec3 color(const Ray& r, HitObjectList& world, int bounce)
 {
 	hit_record hit;
@@ -25,6 +26,7 @@ vec3 color(const Ray& r, HitObjectList& world, int bounce)
 				   t * vec3(0.5, 0.7, 1.0));
 }
 
+/*Self explantory*/
 void Random_world_gen(HitObjectList& w) {
 	w.addObject(new Sphere(vec3(0, -1000, -1), 1000, new lambertian(vec3(0.5, 0.5, 0.5))));
 

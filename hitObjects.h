@@ -6,6 +6,7 @@
 
 class Material;
 
+/*A struct of store all the rays hit properties*/
 struct hit_record {
     vec3        normal;
     double      t;
@@ -13,12 +14,14 @@ struct hit_record {
     const Material*   mat;
 };
 
+/*The Abstract class responsible of all of the diff materials*/
 class Material {
     public:
         virtual bool scatter(const Ray& r, const hit_record& rec,
                              vec3& attn, Ray& scattered) const = 0;
 };
 
+/*The material that don't reflect and scatter the light randomly*/
 class lambertian : public Material {
     private:
         vec3 albedo;
@@ -28,6 +31,7 @@ class lambertian : public Material {
                       vec3& attn, Ray& scattered) const override;
 };
 
+/*Scatter the light uniformly basically reflection*/
 class Metal : public Material {
     private:
         vec3 albedo;
@@ -38,17 +42,19 @@ class Metal : public Material {
                       vec3& attn, Ray& scattered) const override;
 };
 
+/*Refact and Reflect light like water*/
 class refraction: public Material {
     private:
         double refraction_index;
         bool refract(const vec3& v, const vec3& n, double ni_over_nt, vec3& refracted) const;
-        double schlick(double cosine, double ri) const;
+        double schlick(double cosine, double ri) const; //Returns the material's reflective angle
     public:
         refraction(double ri);
         bool scatter(const Ray& r, const hit_record& rec,
                       vec3& attn, Ray& scattered) const override;
 };
 
+/*EveryThing that Light can hit on*/
 class hitable {
     public:
         virtual bool hit_test(const Ray& r, double tmin, double tmax, hit_record & h) = 0;
@@ -64,6 +70,7 @@ class Sphere : public hitable{
         bool hit_test(const Ray& r, double tmin, double tmax, hit_record& h) override;
 };
 
+/*To store all the hit objects in the scene*/
 class HitObjectList : public hitable {
     private:
         std::vector<hitable*> hit_list;

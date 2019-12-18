@@ -13,7 +13,7 @@ class Camera{
         Camera(vec3 lookfrom, vec3 lookat,
                vec3 vup, double fov_, 
                double aspect_);
-        Ray get_ray(double u, double v);
+        Ray get_ray(double u, double v); // Returns the ray for that pixel
 
 };
 

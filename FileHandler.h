@@ -3,6 +3,7 @@
 #include <cstdint>
 #include "vec3.h"
 
+/*The buffer to store all the pixels*/
 class Framebuffer {
 		  private:
 		  		int width, height;

@@ -8,7 +8,7 @@ Camera::Camera(vec3 lookfrom, vec3 lookat,
     vec3 u, v, w;
     double fov_rad = fov_ * 3.14159 / 180;
 
-    half_h = tan(fov_rad / 2);
+    half_h = tan(fov_rad / 2); // Just simple trigonometry
     half_w = aspect_ * half_h;
 
     origin = lookfrom;
@@ -17,7 +17,7 @@ Camera::Camera(vec3 lookfrom, vec3 lookat,
     u = vec3::cross(vup,w).normalize();
     v = vec3::cross(w, u);
 
-    lower_left = origin - half_w * u - half_h * v - w;
+    lower_left = origin - half_w * u - half_h * v - w; // Calculate the lower left corner of the image
 
     horizontal = 2 * half_w * u;
     vertical = 2 * half_h * v;
