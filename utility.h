@@ -16,13 +16,12 @@ static float randf() {
 }
 
 static vec3 random_in_unit_sphere() {
-	vec3 p;
-
-	do{
-		p = vec3(randf(), randf(), randf()) * 2.0 - vec3(1, 1, 1);
-	} while(p.squared_length() >= 1.0);
-
-	return p;
+	double z = randf() * 2.0 - 1.0;
+	double a = randf() * 2.0 * 3.1415926;
+	double r = sqrtf(1.0 - z * z);
+	double x = r * cosf(a);
+	double y = r * sinf(a);
+	return vec3(x, y, z);
 }
 
 

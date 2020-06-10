@@ -10,8 +10,32 @@ class Material;
 struct hit_record {
     vec3        normal;
     double      t;
+    double      u;
+    double      v;
     vec3        p;
     const Material*   mat;
+};
+
+class texture {
+    public:
+        virtual vec3 value(double u, double v, const vec3& p) = 0;
+};
+
+class constant_texture : public texture {
+    private:
+        vec3 color;
+    public:
+        constant_texture(const vec3& c_);
+        vec3 value(double u, double v, const vec3& p) override;
+};
+
+class checker_board : public texture {
+    private:
+        texture* o; texture* e;
+        double size;                            // Lower number means bigger in size
+    public:
+        checker_board(texture* o_, texture* e_, double s_);
+        vec3 value(double u, double v, const vec3& p) override;
 };
 
 /*The Abstract class responsible of all of the diff materials*/
@@ -19,14 +43,26 @@ class Material {
     public:
         virtual bool scatter(const Ray& r, const hit_record& rec,
                              vec3& attn, Ray& scattered) const = 0;
+        virtual vec3 emmited(double u, double v, const vec3& p) const { return vec3(0); }
+};
+
+class diffuse_light : public Material {
+    private:
+        texture* color;
+    public:
+        diffuse_light(texture* a);
+        bool scatter(const Ray& r, const hit_record& rec,
+                             vec3& attn, Ray& scattered) const override { return false; }
+        
+        vec3 emmited(double u, double v, const vec3& p) const override;
 };
 
 /*The material that don't reflect and scatter the light randomly*/
 class lambertian : public Material {
     private:
-        vec3 albedo;
+        texture* albedo;
     public:
-        lambertian(const vec3& a);
+        lambertian(texture * a);
         bool scatter(const Ray& r, const hit_record& rec,
                       vec3& attn, Ray& scattered) const override;
 };
@@ -34,10 +70,10 @@ class lambertian : public Material {
 /*Scatter the light uniformly basically reflection*/
 class Metal : public Material {
     private:
-        vec3 albedo;
+        texture* albedo;
         double fuzz;
     public:
-        Metal(const vec3& a, double f);
+        Metal(texture* a, double f);
         bool scatter(const Ray& r, const hit_record& rec,
                       vec3& attn, Ray& scattered) const override;
 };

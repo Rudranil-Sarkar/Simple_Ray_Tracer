@@ -2,6 +2,7 @@
 #define __CAMERA_H__
 
 #include "ray.h"
+#include "iostream"
 
 class Camera{
     private:

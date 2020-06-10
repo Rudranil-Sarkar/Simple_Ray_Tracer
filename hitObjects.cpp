@@ -23,16 +23,53 @@ bool Sphere::hit_test(const Ray& r, double tmin, double tmax, hit_record& h) {
         h.p = r.point_at_parameter(h.t);
         h.normal = (h.p - center) * (1 / Radius);
         h.mat = mat;
+
+        double phi = atan2(h.p.z, h.p.x);
+        double theta = asin(h.p.y);
+
+        h.u = 1 - (phi + (22.0 / 7.0)) / (2 * (22.0 / 7.0));
+        h.v = (theta + (22.0 / 7.0) / 2) / (22.0 / 7.0);
     }
 
     return d > 0.0;
+}
+
+constant_texture::constant_texture(const vec3& c_)
+    :color(c_)
+    {}
+
+vec3 constant_texture::value(double u, double v, const vec3& p)
+{
+    return color;
+}
+
+checker_board::checker_board(texture * o_, texture * e_, double s_)
+    :o(o_), e(e_), size(s_)
+    {}
+
+vec3 checker_board::value(double u, double v, const vec3& p)
+{
+    double d = sin(size * p.x) * sin(size * p.y) * sin(size * p.z);
+
+    if(d < 0)
+        return o->value(u, v, p);
+    return e->value(u, v, p);
 }
 
 Sphere::Sphere(vec3 c, double R, Material* mat_)
     :center(c), Radius(R), mat(mat_)
     {}
 
-lambertian::lambertian(const vec3& a)
+diffuse_light::diffuse_light(texture* a)
+    :color(a)
+    {}
+
+vec3 diffuse_light::emmited(double u, double v, const vec3& p) const
+{
+    return color -> value(u, v, p);
+}
+
+lambertian::lambertian(texture * a)
     :albedo(a)
     {}
 
@@ -40,19 +77,19 @@ bool lambertian::scatter(const Ray& r, const hit_record& rec,
                           vec3& attn, Ray& scattered) const
 {
     vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-    attn = albedo;
+    attn = albedo -> value(0, 0, rec.p);
     scattered = Ray(rec.p, target - rec.p);
     return true;
 }
 
-Metal::Metal(const vec3& a, double f)
+Metal::Metal(texture* a, double f)
     :albedo(a), fuzz(f)
     {}
 
 bool Metal::scatter(const Ray& r, const hit_record& rec,
                     vec3& attn, Ray& scattered) const
 {
-    attn = albedo;
+    attn = albedo -> value(0, 0, rec.p);
     vec3 reflected = r.getDirection() - 2 * vec3::dot(r.getDirection(), 
                                                       rec.normal) * rec.normal;
 

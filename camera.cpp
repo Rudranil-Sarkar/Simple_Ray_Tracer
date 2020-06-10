@@ -25,5 +25,6 @@ Camera::Camera(vec3 lookfrom, vec3 lookat,
 
 Ray Camera::get_ray(double u, double v)
 {
-    return Ray(origin, lower_left + u * horizontal + v * vertical - origin);
+	vec3 temp(u * horizontal + v * vertical - origin);
+    return Ray(origin, lower_left + temp);
 }
